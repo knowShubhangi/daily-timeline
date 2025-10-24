@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+# Daily Planner
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A **teal-gradient, mobile-friendly daily planner** built with React, featuring checklists, streak tracking, and persistent local storage.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+* ✅ Track daily tasks with checkboxes
+* 🌈 Color-coded time blocks for visual clarity
+* 🔥 Streak counter to maintain consistency
+* 📝 Editable task labels and notes
+* 📱 Mobile optimized
+* 💾 State is saved locally in the browser using `localStorage`
+* 🎨 Teal-gradient soft background for eye-friendly experience
 
-### `npm start`
+## Daily Schedule Example
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Wake & Sunlight (8:30 AM) - Hydrate + 10m sunlight
+2. Meditation (9:30 - 10:00 AM) - 30 min guided / breathwork
+3. Breakfast (10:00 - 10:30 AM) - Protein-rich meal
+4. Work Block 1 (11:00 AM - 2:00 PM) - Deep work / focused tasks
+5. Lunch (2:00 - 2:30 PM) - Balanced meal
+6. Rest / Prep (2:30 - 3:15 PM) - Stretch, short walk
+7. Gym + Commute (3:30 - 6:30 PM) - Workout + travel
+8. Work Block 2 (7:30 - 9:00 PM) - Admin / light work
+9. Dinner (9:00 - 9:30 PM) - Nutritious meal
+10. Meetings (9:30 - 11:30 PM) - Team syncs
+11. Wind Down (11:30 PM - 12:15 AM) - Games, read, reflect
+12. Sleep (1:00 AM) - Aim for 7+ hours
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1. Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   git clone <repo_url>
+   cd <repo_folder>
+   ```
+2. Install dependencies:
 
-### `npm run build`
+   ```bash
+   npm install
+   ```
+3. Start the development server:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```bash
+   npm start
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Deployment
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* Build the app:
 
-### `npm run eject`
+  ```bash
+  npm run build
+  ```
+* Host the `build/` folder on your preferred platform (GitHub Pages, Netlify, Vercel, or your own server).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Usage
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* Check tasks as you complete them.
+* Edit task labels and notes inline.
+* Click `+1 Day` to increment your streak.
+* Click `Reset Checkmarks` to clear daily progress.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Notes
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* All data is stored locally in your browser; progress **will not sync across devices**.
+* Works best on modern browsers with localStorage support.
 
-## Learn More
+## License
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT License

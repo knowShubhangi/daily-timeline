@@ -1,125 +1,277 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 
-// Daily Timeline — Teal Gradient Motivator with Checklists, Streaks & Colours
-// Energetic but calm teal tones, mobile responsive, persistent state.
+// Daily Timeline v2 — Core/Lite Planner
+// Single-file React component (Tailwind classes assumed available)
+// Features: Core / Lite toggle, daywise checklist, daily archive, 7-day bar graph + text list, editable greeting/quote
 
-const defaultBlocks = [
-  { id: 1, label: "Wake & Sunlight", time: "8:30 AM", note: "Hydrate + 10m sunlight", done: false },
-  { id: 2, label: "Meditation", time: "9:30 - 10:00 AM", note: "30 min guided / breathwork", done: false },
-  { id: 3, label: "Breakfast", time: "10:00 - 10:30 AM", note: "Protein-rich meal", done: false },
-  { id: 4, label: "Work Block 1", time: "11:00 AM - 2:00 PM", note: "Deep work / focused tasks", done: false },
-  { id: 5, label: "Lunch", time: "2:00 - 2:30 PM", note: "Balanced meal", done: false },
-  { id: 6, label: "Rest / Prep", time: "2:30 - 3:15 PM", note: "Stretch, short walk", done: false },
-  { id: 7, label: "Gym + Commute", time: "3:30 - 6:30 PM", note: "Workout + travel", done: false },
-  { id: 8, label: "Work Block 2", time: "7:30 - 9:00 PM", note: "Admin / light work", done: false },
-  { id: 9, label: "Dinner", time: "9:00 PM - 9:30 PM", note: "Nutritious meal", done: false },
-  { id: 10, label: "Meetings", time: "9:30 - 11:30 PM", note: "Team syncs", done: false },
-  { id: 11, label: "Wind Down", time: "11:30 PM - 12:15 AM", note: "Games, read, reflect", done: false },
-  { id: 12, label: "Sleep", time: "1:00 AM", note: "Aim for 7+ hours", done: false }
+const CORE_BLOCKS = [
+  { id: 1, label: 'Wake & Sunlight', time: '10:30 AM' },
+  { id: 2, label: 'Freshen up / Shower', time: '10:50 - 11:20 AM' },
+  { id: 3, label: 'Make & Eat Breakfast', time: '11:20 - 12:00 PM' },
+  { id: 4, label: 'Meditation', time: '12:00 - 12:30 PM' },
+  { id: 5, label: 'Transition / Prep', time: '12:30 - 1:00 PM' },
+  { id: 6, label: 'Work Block 1', time: '1:00 - 4:00 PM' },
+  { id: 7, label: 'Lunch', time: '4:00 - 4:30 PM' },
+  { id: 8, label: 'Gym / Movement', time: '4:30 - 6:30 PM' },
+  { id: 9, label: 'Shower + Snack', time: '7:00 - 7:30 PM' },
+  { id: 10, label: 'Work Block 2', time: '7:30 - 9:00 PM' },
+  { id: 11, label: 'Dinner', time: '9:00 - 9:30 PM' },
+  { id: 12, label: 'Meetings', time: '9:30 - 10:30 PM' },
+  { id: 13, label: 'Relax / Wind-down', time: '10:30 - 12:30 AM' },
+  { id: 14, label: 'Sleep', time: '2:30 - 3:00 AM' }
 ];
 
-function Block({ block, onEdit, onToggle }) {
-  const [editing, setEditing] = useState(false);
-  const [local, setLocal] = useState(block);
-  useEffect(() => setLocal(block), [block]);
+const LITE_BLOCKS = [
+  { id: 1, label: 'Wake & Sunlight', time: 'By 11:30 AM' },
+  { id: 2, label: '10-min Self-care', time: 'Anytime' },
+  { id: 3, label: '2 focused hours', time: 'Anytime' },
+  { id: 4, label: '15-20 min movement', time: 'Anytime' },
+  { id: 5, label: 'Two proper meals', time: 'Anytime' },
+  { id: 6, label: '20 min no-screen wind-down', time: 'Before bed' }
+];
 
-  const colorMap = {
-    1: 'bg-teal-50', 2: 'bg-teal-100', 3: 'bg-teal-50', 4: 'bg-emerald-50', 5: 'bg-lime-50',
-    6: 'bg-cyan-50', 7: 'bg-sky-50', 8: 'bg-blue-50', 9: 'bg-indigo-50', 10: 'bg-violet-50', 11: 'bg-fuchsia-50', 12: 'bg-pink-50'
-  };
+const STORAGE_KEY = 'dtv2.storage.v1';
 
-  return (
-    <div className={`flex items-start gap-3 p-3 rounded-2xl shadow-md transition-all duration-200 ${block.done ? 'border border-teal-300 bg-gradient-to-r from-teal-50 to-emerald-50' : colorMap[block.id]}`}>
-      <input
-        type="checkbox"
-        checked={block.done}
-        onChange={() => onToggle(block.id)}
-        className="mt-1 accent-teal-500 w-5 h-5 shrink-0"
-      />
-      <div className="flex-1">
-        <div className="flex justify-between items-center">
-          {editing ? (
-            <input
-              className="w-full text-lg font-semibold bg-slate-100 p-1 rounded"
-              value={local.label}
-              onChange={(e) => setLocal({ ...local, label: e.target.value })}
-            />
-          ) : (
-            <div className={`text-lg font-semibold ${block.done ? 'line-through text-slate-400' : 'text-slate-900'}`}>{block.label}</div>
-          )}
-          <button
-            onClick={() => {
-              if (editing) onEdit(local);
-              setEditing(!editing);
-            }}
-            className="px-2 py-1 text-xs rounded bg-slate-200 hover:bg-slate-300"
-          >
-            {editing ? 'Save' : 'Edit'}
-          </button>
-        </div>
-        <div className="text-sm text-slate-600 mt-1">
-          {editing ? (
-            <input
-              className="w-full bg-slate-100 p-1 rounded"
-              value={local.note}
-              onChange={(e) => setLocal({ ...local, note: e.target.value })}
-            />
-          ) : (
-            <span className={`${block.done ? 'text-slate-400' : ''}`}>{block.note}</span>
-          )}
-        </div>
-        <div className="text-xs text-slate-500 mt-1">{block.time}</div>
-      </div>
-    </div>
-  );
+function todayKey(date = new Date()) {
+  return date.toISOString().split('T')[0];
 }
 
-export default function DailyTimeline() {
-  const [blocks, setBlocks] = useState(() => {
+export default function DailyTimelineV2() {
+  const [mode, setMode] = useState('core'); // 'core' or 'lite'
+  const [blocks, setBlocks] = useState([]);
+  const [doneMap, setDoneMap] = useState({}); // { date: { id: true }} for current day only
+  const [quote, setQuote] = useState('Progress beats perfection.');
+  const [greetingName, setGreetingName] = useState('Shubhangi');
+  const [history, setHistory] = useState({}); // { '2025-10-27': {completed, total} }
+  const dateRef = useRef(todayKey());
+
+  // load from storage
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem('timeline.blocks.v3');
-      return saved ? JSON.parse(saved) : defaultBlocks;
-    } catch {
-      return defaultBlocks;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setMode(parsed.mode || 'core');
+        setQuote(parsed.quote || 'Progress beats perfection.');
+        setGreetingName(parsed.greetingName || 'Shubhangi');
+        setHistory(parsed.history || {});
+        const currentDate = todayKey();
+        const savedToday = parsed.today && parsed.today.date === currentDate ? parsed.today : null;
+        const initialBlocks = (parsed.mode === 'lite' ? LITE_BLOCKS : CORE_BLOCKS);
+        setBlocks(initialBlocks.map(b => ({ ...b })));
+        if (savedToday && savedToday.doneMap) {
+          setDoneMap(savedToday.doneMap);
+        } else {
+          // initialize empty doneMap
+          setDoneMap({});
+        }
+      } else {
+        setMode('core');
+        setQuote('Progress beats perfection.');
+        setBlocks(CORE_BLOCKS.map(b => ({ ...b })));
+        setDoneMap({});
+      }
+    } catch (err) {
+      console.error('load err', err);
+      setBlocks(CORE_BLOCKS.map(b => ({ ...b })));
+      setDoneMap({});
     }
-  });
-  const [quote, setQuote] = useState(localStorage.getItem('timeline.quote.v3') || 'Progress beats perfection.');
-  const [streak, setStreak] = useState(() => parseInt(localStorage.getItem('timeline.streak.v3')) || 0);
+  }, []);
 
-  useEffect(() => localStorage.setItem('timeline.blocks.v3', JSON.stringify(blocks)), [blocks]);
-  useEffect(() => localStorage.setItem('timeline.quote.v3', quote), [quote]);
-  useEffect(() => localStorage.setItem('timeline.streak.v3', streak), [streak]);
+  // persist storage
+  useEffect(() => {
+    const payload = {
+      mode,
+      quote,
+      greetingName,
+      history,
+      today: { date: todayKey(), doneMap }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  }, [mode, quote, greetingName, history, doneMap]);
 
-  const handleEdit = (updated) => setBlocks((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
-  const handleToggle = (id) => setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, done: !b.done } : b)));
-  const resetAll = () => setBlocks((prev) => prev.map((b) => ({ ...b, done: false })));
-  const incrementStreak = () => setStreak((prev) => prev + 1);
+  // if mode changes, swap blocks and clear today's doneMap (but keep saved today's doneMap if date same)
+  useEffect(() => {
+    setBlocks((mode === 'lite' ? LITE_BLOCKS : CORE_BLOCKS).map(b => ({ ...b })));
+    // don't clear doneMap automatically; keep user progress for the day
+  }, [mode]);
+
+  // helper to toggle checkbox
+  function toggle(id) {
+    setDoneMap(prev => {
+      const next = { ...prev };
+      next[id] = !next[id];
+      return next;
+    });
+  }
+
+  // compute today's stats
+  function todayStats() {
+    const total = blocks.length;
+    const completed = Object.values(doneMap).filter(Boolean).length;
+    return { completed, total };
+  }
+
+  // archive previous day at midnight — we'll check every 30s
+  useEffect(() => {
+    const tick = () => {
+      const current = todayKey();
+      if (dateRef.current !== current) {
+        // day changed — archive previous
+        const prevDate = dateRef.current;
+        const completed = Object.values(doneMap).filter(Boolean).length;
+        const total = blocks.length;
+        setHistory(prev => {
+          const h = { ...prev };
+          h[prevDate] = { completed, total };
+          // keep only last 30 days
+          const keys = Object.keys(h).sort((a,b)=>b.localeCompare(a)).slice(0, 90);
+          const trimmed = {};
+          keys.reverse().forEach(k => { trimmed[k] = h[k]; });
+          return trimmed;
+        });
+        // reset for new day
+        dateRef.current = current;
+        setDoneMap({});
+      }
+    };
+    const id = setInterval(tick, 30_000);
+    // also run once on mount to handle timezone switches
+    tick();
+    return () => clearInterval(id);
+  }, [doneMap, blocks.length]);
+
+  // quick helpers to export/import history or reset
+  function resetTodayChecks() {
+    setDoneMap({});
+  }
+
+  function clearAllData() {
+    if (!confirm('Clear all stored planner data? This will remove history and settings.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    setHistory({});
+    setDoneMap({});
+    setMode('core');
+    setQuote('Progress beats perfection.');
+  }
+
+  // derive last 7 days for chart
+  function lastNDays(n=7) {
+    const arr = [];
+    const today = new Date();
+    for (let i = n-1; i >=0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const k = todayKey(d);
+      const rec = history[k];
+      if (k === todayKey()) {
+        const cur = todayStats();
+        arr.push({ date:k, completed:cur.completed, total:cur.total });
+      } else if (rec) {
+        arr.push({ date:k, completed:rec.completed, total:rec.total });
+      } else {
+        arr.push({ date:k, completed:0, total: blocks.length });
+      }
+    }
+    return arr;
+  }
+
+  const stats = todayStats();
+  const recent = lastNDays(7);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-100 via-teal-200 to-teal-300 p-4 sm:p-6 flex justify-center">
-      <div className="w-full max-w-md sm:max-w-3xl">
-        <header className="mb-5 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-teal-800">Daily Motivator</h1>
-          <input
-            className="mt-2 text-base sm:text-lg font-medium text-teal-700 bg-transparent border-b border-teal-300 text-center w-full focus:outline-none"
-            value={quote}
-            onChange={(e) => setQuote(e.target.value)}
-          />
-          <div className="mt-3 text-teal-700 font-medium">🔥 Streak: {streak} days</div>
+    <div className="min-h-screen bg-gradient-to-b from-teal-900 via-teal-700 to-teal-500 text-slate-50 p-4 sm:p-6 flex justify-center">
+      <div className="w-full max-w-3xl">
+
+        {/* Header */}
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <div className="text-sm opacity-80">Hi <input value={greetingName} onChange={(e)=>setGreetingName(e.target.value)} className="bg-transparent border-b border-teal-600 text-xl font-semibold text-white w-36 focus:outline-none" /> 🌼</div>
+            <h1 className="text-2xl sm:text-3xl font-bold mt-1">{quote}</h1>
+            <div className="text-sm opacity-80 mt-1">Today: {todayKey()}</div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="bg-white/8 px-3 py-2 rounded-full text-sm text-emerald-100">Mode</div>
+            <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
+              <button onClick={()=>setMode('core')} className={`px-3 py-1 rounded-full ${mode==='core' ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'}`}>Core</button>
+              <button onClick={()=>setMode('lite')} className={`px-3 py-1 rounded-full ${mode==='lite' ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'}`}>Lite</button>
+            </div>
+          </div>
         </header>
 
-        <main className="grid gap-3 sm:gap-4">
-          {blocks.map((block) => (
-            <Block key={block.id} block={block} onEdit={handleEdit} onToggle={handleToggle} />
-          ))}
-        </main>
+        {/* Main grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Left: checklist */}
+          <section className="md:col-span-2 bg-white/6 rounded-2xl p-4 shadow-inner">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="text-sm opacity-80">{mode==='core' ? 'Core Routine' : 'Lite Routine'}</div>
+                <div className="text-lg font-semibold">Progress: {stats.completed}/{stats.total}</div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={resetTodayChecks} className="px-3 py-2 bg-white/10 rounded">Reset Checkmarks</button>
+                <button onClick={clearAllData} className="px-3 py-2 bg-white/10 rounded">Clear All</button>
+              </div>
+            </div>
 
-        <div className="flex justify-center gap-3 mt-6">
-          <button onClick={incrementStreak} className="px-3 py-2 bg-emerald-500 text-white rounded-lg shadow hover:bg-emerald-600">+1 Day</button>
-          <button onClick={resetAll} className="px-3 py-2 bg-slate-300 text-slate-800 rounded-lg shadow hover:bg-slate-400">Reset Checkmarks</button>
+            <div className="space-y-2">
+              {blocks.map((b) => (
+                <div key={b.id} className={`flex items-center justify-between p-3 rounded-xl ${doneMap[b.id] ? 'bg-emerald-600/80 text-white' : 'bg-white/10'}`}>
+                  <div>
+                    <div className="font-semibold">{b.label}</div>
+                    <div className="text-xs opacity-80">{b.time}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm opacity-80">{doneMap[b.id] ? 'Done' : ''}</div>
+                    <input type="checkbox" checked={!!doneMap[b.id]} onChange={()=>toggle(b.id)} className="h-5 w-5 accent-emerald-400" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Right: stats & history */}
+          <aside className="bg-white/6 rounded-2xl p-4">
+            <div className="mb-4">
+              <div className="text-sm opacity-80">7-day progress</div>
+              <div className="mt-3 space-y-2">
+                {recent.map((r, i) => {
+                  const pct = r.total ? Math.round((r.completed / r.total) * 100) : 0;
+                  return (
+                    <div key={r.date} className="flex items-center gap-3">
+                      <div className="text-xs w-20 opacity-80">{r.date.slice(5)}</div>
+                      <div className="flex-1 h-3 bg-white/10 rounded overflow-hidden">
+                        <div style={{ width: `${pct}%` }} className={`h-3 bg-emerald-400`}></div>
+                      </div>
+                      <div className="text-sm w-12 text-right">{r.completed}/{r.total}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm opacity-80 mb-2">Recent log</div>
+              <div className="text-xs space-y-1">
+                {Object.keys(history).slice().reverse().slice(0,7).map(d => (
+                  <div key={d} className="flex justify-between">
+                    <div className="opacity-90">{d}</div>
+                    <div className="font-medium">{history[d].completed}/{history[d].total}</div>
+                  </div>
+                ))}
+                {/* include today too */}
+                <div className="flex justify-between mt-2 border-t border-white/6 pt-2">
+                  <div className="opacity-90">{todayKey()}</div>
+                  <div className="font-medium">{stats.completed}/{stats.total}</div>
+                </div>
+              </div>
+            </div>
+
+          </aside>
         </div>
 
-        <footer className="text-center text-xs text-teal-700 mt-6">All progress saves locally • Reset anytime by clearing site data</footer>
+        <footer className="mt-6 text-center text-sm opacity-80">All data stored locally • No reminders • Toggle Core / Lite as needed</footer>
       </div>
     </div>
   );
